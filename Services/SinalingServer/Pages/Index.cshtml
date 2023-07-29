@@ -1,0 +1,35 @@
+﻿@page
+@model SinalingServer.Pages.IndexModel
+@{
+}
+
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+        <script defer type="text/javascript">
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/home")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+            async function start() {
+                try {
+                    await connection.start();
+                    console.log("SignalR Connected.");
+                } catch (err) {
+                    console.log(err);
+                    setTimeout(start, 5000);
+                }
+            };
+
+            connection.onclose(async () => {
+                await start();
+            });
+
+            // Start the connection.
+            start();
+
+            connection.on("HelloWorld", (message) => console.log(`${message}`));
+        </script>
+    </head>
+</html>
