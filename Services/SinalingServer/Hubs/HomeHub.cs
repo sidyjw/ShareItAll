@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SinalingServer.Domain;
+using SinalingServer.Interfaces;
 
 namespace SinalingServer.Hubs
 {
-    public class HomeHub : Hub
+    public class HomeHub : Hub<IHome>
     {
 
-        public override async Task OnConnectedAsync()
-        {
-            await Clients.Caller.SendAsync("HelloWorld", $"Olá, mundo! ID:{Context.ConnectionId}");
+        [HubMethodName("SendConnectionDetails")]
+        public async Task OnReceiveConnectionDetails(ConnectionDetails connectionDetails) {
+            await Groups.AddToGroupAsync(Context.ConnectionId, connectionDetails.IPHash);
+            await Clients.OthersInGroup(connectionDetails.IPHash).ShareConnectionDetailsToAllClients(connectionDetails);
         }
+
     }
 }

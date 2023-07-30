@@ -27,9 +27,27 @@
             });
 
             // Start the connection.
-            start();
+            start()
+            .then( () => regras());
 
-            connection.on("HelloWorld", (message) => console.log(`${message}`));
+
+            function regras() {
+                enviarDetalhes();
+                receberDetalhes();
+            }
+
+            function enviarDetalhes() {
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.ip);
+                        connection.invoke("SendConnectionDetails", { IPHash: data.ip });
+                    });
+            }
+
+            function receberDetalhes() {
+            connection.on("ShareConnectionDetailsToAllClients", ({ ipHash }) => console.log(`O ${ipHash} quer se conectar`));
+            }
         </script>
     </head>
 </html>
